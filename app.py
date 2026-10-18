@@ -1,5 +1,4 @@
 import streamlit as st
-from urllib.parse import urlparse, parse_qs
 import requests
 
 st.set_page_config(page_title="YT Thumbnail Downloader", page_icon="📸")
@@ -8,7 +7,7 @@ st.write("Paste any YouTube video link and download the HD Thumbnail instantly!"
 
 st.write("---")
 
-video_url = st.text_input("Enter YouTube Video Link:", placeholder="https://youtube.com...")
+video_url = st.text_input("Enter YouTube Video Link:", placeholder="https://www.youtube.com/watch?v=...")
 
 st.write("---")
 
@@ -16,14 +15,19 @@ if video_url:
     video_id = None
     
     try:
-        parsed_url = urlparse(video_url)
-        if parsed_url.hostname in ('://youtube.com', 'youtube.com'):
-            if parsed_url.path == '/watch':
-                video_id = parse_qs(parsed_url.query).get('v', [None])[0]
-            elif parsed_url.path.startswith(('/embed/', '/v/', '/shorts/')):
-                video_id = parsed_url.path.split('/')[2]
-        elif parsed_url.hostname == 'youtu.be':
-            video_id = parsed_url.path[1:]
+        # Strict logic processing loops to avoid array parsing crashes on Cloud
+        if "v=" in video_url:
+            parts = video_url.split("v=")
+            if len(parts) > 1:
+                video_id = parts[1].split("&")[0]
+        elif "youtu.be/" in video_url:
+            parts = video_url.split("youtu.be/")
+            if len(parts) > 1:
+                video_id = parts[1].split("?")[0]
+        elif "shorts/" in video_url:
+            parts = video_url.split("shorts/")
+            if len(parts) > 1:
+                video_id = parts[1].split("?")[0]
     except Exception:
         video_id = None
 
@@ -49,12 +53,12 @@ if video_url:
                 )
             else:
                 st.error("High-Definition thumbnail is not available for this video.")
-        except Exception as e:
+        except Exception:
             st.error("Network error occurred while fetching the image.")
     else:
         st.error("Invalid Link! Please enter a valid YouTube video URL.")
 
 st.write("---")
-st.caption("Developed by Keshav  Thathai| Need custom video utility tools for your brand? Contact me: thataikeshav873@gmail.com")
+st.caption("Developed by Keshav | Need custom video utility tools for your brand? Contact me!")
 
 
