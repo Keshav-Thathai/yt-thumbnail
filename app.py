@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import re
 
 st.set_page_config(page_title="YT Thumbnail Downloader", page_icon="📸")
 st.title("📸 YouTube Thumbnail Grabber & Downloader")
@@ -15,13 +16,11 @@ if video_url:
     video_id = None
     
     try:
-        # Standard video string filtering adjustments
-        if "v=" in video_url:
-            video_id = video_url.split("v=")[1].split("&")[0]
-        elif "youtu.be/" in video_url:
-            video_id = video_url.split("youtu.be/")[1].split("?")[0]
-        elif "shorts/" in video_url:
-            video_id = video_url.split("shorts/")[1].split("?")[0]
+        # Standard Regex engine to match and pull 11-character YouTube video ID instantly
+        regex = r"(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|shorts\/|.*[?&]v=)|youtu\.be\/)([^\"&?\/\s]{11})"
+        match = re.search(regex, video_url)
+        if match:
+            video_id = match.group(1)
     except Exception:
         video_id = None
 
@@ -31,6 +30,7 @@ if video_url:
         try:
             response = requests.get(thumbnail_url)
             
+            # Fallback setup if Max Resolution doesn't exist
             if response.status_code != 200:
                 thumbnail_url = f"https://youtube.com{video_id}/hqdefault.jpg"
                 response = requests.get(thumbnail_url)
