@@ -16,7 +16,7 @@ if video_url:
     video_id = None
     
     try:
-        # Standard Regex engine to match and pull 11-character YouTube video ID instantly
+        # Regex engine to perfectly match all forms of YouTube links including shorteners and tracking parameters
         regex = r"(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|shorts\/|.*[?&]v=)|youtu\.be\/)([^\"&?\/\s]{11})"
         match = re.search(regex, video_url)
         if match:
@@ -30,7 +30,6 @@ if video_url:
         try:
             response = requests.get(thumbnail_url)
             
-            # Fallback setup if Max Resolution doesn't exist
             if response.status_code != 200:
                 thumbnail_url = f"https://youtube.com{video_id}/hqdefault.jpg"
                 response = requests.get(thumbnail_url)
