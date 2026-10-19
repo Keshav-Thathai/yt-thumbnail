@@ -45,7 +45,7 @@ if video_url:
                     box-sizing: border-box;
                 ">📥 Click Here to Open & Save Image</a>
             </div>
-        
+        '''
         st.markdown(html_display, unsafe_allow_html=True)
         st.success("🎉 Thumbnail processed safely!")
         
