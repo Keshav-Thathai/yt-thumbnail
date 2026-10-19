@@ -1,5 +1,4 @@
 import streamlit as st
-import requests
 import re
 
 st.set_page_config(page_title="YT Thumbnail Downloader", page_icon="📸")
@@ -16,7 +15,6 @@ if video_url:
     video_id = None
     
     try:
-        # Regex engine to perfectly match all forms of YouTube links including shorteners and tracking parameters
         regex = r"(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|shorts\/|.*[?&]v=)|youtu\.be\/)([^\"&?\/\s]{11})"
         match = re.search(regex, video_url)
         if match:
@@ -27,31 +25,28 @@ if video_url:
     if video_id:
         thumbnail_url = f"https://youtube.com{video_id}/maxresdefault.jpg"
         
-        try:
-            response = requests.get(thumbnail_url)
-            
-            if response.status_code != 200:
-                thumbnail_url = f"https://youtube.com{video_id}/hqdefault.jpg"
-                response = requests.get(thumbnail_url)
-                
-            if response.status_code == 200:
-                img_bytes = response.content
-                
-                st.subheader("🖼️ Thumbnail Preview:")
-                st.image(thumbnail_url, use_container_width=True)
-                
-                st.write("---")
-                st.success("🎉 Download Ready! Click the button below to save.")
-                st.download_button(
-                    label="📥 Click Here to Download Image",
-                    data=img_bytes,
-                    file_name=f"yt_thumbnail_{video_id}.jpg",
-                    mime="image/jpeg"
-                )
-            else:
-                st.error("High-Definition thumbnail is not available for this video link.")
-        except Exception:
-            st.error("Network error occurred while fetching the image database.")
+        st.subheader("🖼️ Thumbnail Preview:")
+        st.image(thumbnail_url, use_container_width=True)
+        
+        st.write("---")
+        st.success("🎉 Thumbnail Grabbed Successfully!")
+        
+        # HTML dynamic link to directly trigger download window bypassing cloud block
+        download_html = f'''
+            <a href="{thumbnail_url}" target="_blank" download="yt_thumbnail.jpg" style="
+                display: inline-block;
+                padding: 0.5em 1em;
+                color: white;
+                background-color: #FF4B4B;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+                text-align: center;
+                width: 100%;
+            ">📥 Click Here to Open & Save Image</a>
+        '''
+        st.markdown(download_html, unsafe_allow_html=True)
+        
     else:
         st.error("Invalid Link! Please enter a valid YouTube video URL.")
 
