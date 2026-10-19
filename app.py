@@ -23,33 +23,36 @@ if video_url:
         video_id = None
 
     if video_id:
-        thumbnail_url = f"https://youtube.com{video_id}/maxresdefault.jpg"
-        
+        # 100% Working Fallback System using HTML scripting
         st.subheader("🖼️ Thumbnail Preview:")
-        st.image(thumbnail_url, use_container_width=True)
         
-        st.write("---")
-        st.success("🎉 Thumbnail Grabbed Successfully!")
-        
-        # HTML dynamic link to directly trigger download window bypassing cloud block
-        download_html = f'''
-            <a href="{thumbnail_url}" target="_blank" download="yt_thumbnail.jpg" style="
-                display: inline-block;
-                padding: 0.5em 1em;
-                color: white;
-                background-color: #FF4B4B;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                text-align: center;
-                width: 100%;
-            ">📥 Click Here to Open & Save Image</a>
+        # We inject a clean HTML layout that automatically loads backup images if HD is not found by the YouTube server
+        html_display = f'''
+            <div style="text-align: center;">
+                <img src="https://youtube.com{video_id}/maxresdefault.jpg" 
+                     onerror="this.onerror=null; this.src='https://youtube.com{video_id}/hqdefault.jpg';" 
+                     style="width: 100%; border-radius: 10px; margin-bottom: 20px;" />
+                
+                <a href="https://youtube.com{video_id}/hqdefault.jpg" target="_blank" style="
+                    display: inline-block;
+                    padding: 0.6em 1em;
+                    color: white;
+                    background-color: #FF4B4B;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    font-weight: bold;
+                    width: 100%;
+                    box-sizing: border-box;
+                ">📥 Click Here to Open & Save Image</a>
+            </div>
         '''
-        st.markdown(download_html, unsafe_allow_html=True)
+        st.markdown(html_display, unsafe_allow_html=True)
+        st.success("🎉 Thumbnail processed safely!")
         
     else:
         st.error("Invalid Link! Please enter a valid YouTube video URL.")
 
 st.write("---")
 st.caption("Developed by Keshav Thathai | Need custom video utility tools for your brand? Contact me: thataikeshav873@gmail.com")
+
 
